@@ -1,3 +1,5 @@
+#1. Search \n 2. Borrow \n 3. Return 
+
 import sqlite3
 conn = sqlite3.connect('library.db')
 
@@ -20,5 +22,5 @@ def searchByTitle (title):
     for row in rows:
         print(row[1])
     print("\n")
-    
-    return
+
+    return 
