@@ -1,5 +1,5 @@
 import sqlite3
 conn = sqlite3.connect('library.db')
-from itemActions import searchBook 
+from itemActions import searchItem 
 
-searchBook()
+searchItem()
