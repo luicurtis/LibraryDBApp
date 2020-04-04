@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime
 conn = sqlite3.connect('library.db')
 
 # Search for a book in the library
@@ -208,11 +209,44 @@ def printMedia(rows):
     return
 
 def borrowItem():
-    cardNumber = input("")
+    cardNumber = input("What is your library card number?\n")
+    assetTag = input("What is the asset tag number of your item?\n")
+
+    with conn:
+        cur = conn.cursor()
+
+        myQuery = "INSERT INTO BorrowedBy (AssetTag, CardNumber) VALUES (:assetTag, :cardNumber)"
+        try:
+            cur.execute(myQuery,{"assetTag":assetTag, "cardNumber":cardNumber})
+
+        except sqlite3.IntegrityError:
+            print("ERROR: There was a problem borrwing the book. Please check that you have entered the correct card member or asset tag!\n")
+            return     
+
+        if conn:
+            conn.commit()
+            print("Success! Book borrowed, please return the book within 14 day to avoid a fine.\n")
     return
 
-def returnItem(assetTag, cardNumber):
+def returnItem():
+    cardNumber = input("What is your library card number?\n")
+    assetTag = input("What is the asset tag number of your item?\n")
+    todaysDate = datetime.today().strftime('%Y-%m-%d')
 
+    with conn:
+        cur = conn.cursor()
+        myQuery = "UPDATE  BorrowedBy SET DateReturned=:todaysDate WHERE AssetTag=:assetTag AND CardNumber=:cardNumber"
+        try:
+            cur.execute(myQuery,{"todaysDate":todaysDate, "assetTag":assetTag, "cardNumber":cardNumber})
+
+        except sqlite3.IntegrityError:
+            print("ERROR: There was a problem returning the book. Please check that you have entered the correct card member or asset tag!!!\n")
+            return     
+
+    if conn:
+            conn.commit()
+            print("Success! Book returned.\n")    
+    
     return
 
 
