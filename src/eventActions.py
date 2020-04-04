@@ -73,7 +73,7 @@ def RegForEvent():
                     """, (EventName, EventDate, UserCardNumber,UFirstname, ULastname))
                 conn.commit()
                 print('\n')
-                print ( 'Registered successfully.' )
+                print ( '##############Registered successfully##############' )
                 print('\n')
 
         else:
