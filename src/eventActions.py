@@ -33,19 +33,19 @@ def FindanEvent():
                 row = cur.fetchone()
                 if row:
                     print("We do have the following Event occuring called, " + UserEventName + ": ")
+                    print(row[0])
+                    print("Date: ")
+                    print(row[1])
+                    print("Fee: ")
+                    print(row[2])
+                    print("Location: ")
+                    print(row[3])
+                    print("\n")
                 else:
                     print("Unfortunately, we do not have any Events called " + UserEventName + "!\n")
-
-                print(row[0])
-                print("Date: ")
-                print(row[1])
-                print("Fee: ")
-                print(row[2])
-                print("Location: ")
-                print(row[3])
-                print("\n")
         else:
             print("Not a Valid Choice, Please Try Again.")
+
     return None
 
 def RegForEvent():
@@ -67,10 +67,17 @@ def RegForEvent():
             ULastname = input("Please enter your Last Name: ")
             with conn:
                 cur = conn.cursor()
-                cur.execute("""
-                    INSERT INTO Attending(EventName, DateOfEvent, CardNumber, FirstName, LastName)
-                    VALUES (?,?,?,?,?)
-                    """, (EventName, EventDate, UserCardNumber,UFirstname, ULastname))
+
+                try:
+                    cur.execute("""
+                        INSERT INTO Attending(EventName, DateOfEvent, CardNumber, FirstName, LastName)
+                        VALUES (?,?,?,?,?)
+                        """, (EventName, EventDate, UserCardNumber,UFirstname, ULastname))
+
+                except sqlite3.IntegrityError:
+                    print("ERROR: There was a problem registering!\n")
+                    break
+
                 conn.commit()
                 print('\n')
                 print ( '##############Registered successfully##############' )

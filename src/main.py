@@ -3,7 +3,7 @@ import sqlite3
 conn = sqlite3.connect('library.db')
 #from src.itemActions import searchByTitle,
 from eventActions import FindanEvent, RegForEvent
-from libraryActions import DonateItem, Volunteer
+from libraryActions import DonateItem, Volunteer, LibrarianHelp
 
 print("Hello, Welcome to the library!\nPlease Select one of the following options by typing the associated number.\n")
 
@@ -28,6 +28,9 @@ while (done != '1'):
 
     elif (choice == '7'):
         Volunteer()
+
+    elif (choice == '8'):
+        LibrarianHelp()
 
 
     else:
