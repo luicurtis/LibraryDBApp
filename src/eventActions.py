@@ -3,6 +3,7 @@ import sqlite3
 conn = sqlite3.connect('library.db')
 
 def FindanEvent():
+    conn.execute('pragma foreign_keys=ON')
     EventSearch = '0'
 
     while (EventSearch != '1'):
@@ -11,7 +12,7 @@ def FindanEvent():
 
         if (UserDecision == '3'):
             EventSearch = '1'
-            break
+            return
 
         elif (UserDecision == '2'):
             with conn:
@@ -49,6 +50,7 @@ def FindanEvent():
     return None
 
 def RegForEvent():
+    conn.execute('pragma foreign_keys=ON')
     Registration = '0'
 
     while(Registration != '1'):
@@ -57,7 +59,7 @@ def RegForEvent():
 
         if (UserDecision == '2'):
             EventSearch = '1'
-            break
+            return
 
         elif (UserDecision == '1'):
             EventName = input("Please enter the Event Name: ")
@@ -74,9 +76,12 @@ def RegForEvent():
                         VALUES (?,?,?,?,?)
                         """, (EventName, EventDate, UserCardNumber,UFirstname, ULastname))
 
-                except sqlite3.IntegrityError:
-                    print("ERROR: There was a problem registering!\n")
-                    break
+                except sqlite3.OperationalError:
+                    print("ERROR: There was a problem registering, make sure the information entered is correct!\n")
+                    return
+                except sqlite3.Error:
+                    print("ERROR: There was a problem registering, make sure the information entered is correct!\n")
+                    return
 
                 conn.commit()
                 print('\n')

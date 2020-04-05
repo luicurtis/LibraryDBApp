@@ -4,9 +4,11 @@ conn = sqlite3.connect('library.db')
 
 # Search for a book in the library
 def searchItem():
+    conn.execute('pragma foreign_keys=ON')
     queryDict = {}
-    itemType = input("What item are you looking for? \n 1. Books \n 2. Magazines \n 3. Scientific Journals \
+    print("What item are you looking for? \n 1. Books \n 2. Magazines \n 3. Scientific Journals \
                     \n 4. DVDs \n 5. CDs \n 6. Records \n 7. Video Games \n")
+    itemType = input("Enter your decision (Example: for Book enter '1'): ")
     # Search for book
     if (itemType == '1'):
         queryDict["type"] = "Book"
@@ -97,7 +99,7 @@ def searchItem():
         else:
             print("ERROR: input " + choice + " is not a possbile input. Please try again.")
             return
-    # Search for Records 
+    # Search for Records
     elif (itemType == '6'):
         queryDict["type"] = "Record"
         print("Choose from the following: \n 1. Search by title \n 2. Search by Artist")
@@ -167,7 +169,7 @@ def searchItem():
             elif (int(itemType) > 3 and int(itemType) <= 7):
                 printMedia(rows)
         else:
-            print("Unfortunately, we do not have any books that fill those search requirements. Please try again.\n") 
+            print("Unfortunately, we do not have any books that fill those search requirements. Please try again.\n")
     return
 
 def printPublications(rows):
@@ -188,7 +190,7 @@ def printPublications(rows):
 
     print("\n")
     return
-    
+
 def printMedia(rows):
     i = 1
     print("Here are the following search results: ")
@@ -209,44 +211,55 @@ def printMedia(rows):
     return
 
 def borrowItem():
+    conn.execute('pragma foreign_keys=ON')
     cardNumber = input("What is your library card number?\n")
     assetTag = input("What is the asset tag number of your item?\n")
 
     with conn:
         cur = conn.cursor()
-
-        myQuery = "INSERT INTO BorrowedBy (AssetTag, CardNumber) VALUES (:assetTag, :cardNumber)"
         try:
-            cur.execute(myQuery,{"assetTag":assetTag, "cardNumber":cardNumber})
+            cur.execute("""
+                INSERT INTO BorrowedBy (AssetTag, CardNumber)
+                VALUES (?,?)
+                """, (cardNumber, assetTag))
+            conn.commit()
 
         except sqlite3.IntegrityError:
-            print("ERROR: There was a problem borrwing the book. Please check that you have entered the correct card member or asset tag!\n")
-            return     
+            print("ERROR: There was a problem borrowing the book. Please check that you have entered the correct card member or asset tag!\n")
+            return
+        except sqlite3.Error:
+            print("ERROR: There was a problem borrowing the book. Please check that you have entered the correct card member or asset tag!\n")
+            return
 
-        if conn:
-            conn.commit()
-            print("Success! Book borrowed, please return the book within 14 day to avoid a fine.\n")
+        print("Success! Book borrowed, please return the book within 14 day to avoid a fine.\n")
     return
 
 def returnItem():
+    conn.execute('pragma foreign_keys=ON')
     cardNumber = input("What is your library card number?\n")
     assetTag = input("What is the asset tag number of your item?\n")
     todaysDate = datetime.today().strftime('%Y-%m-%d')
 
     with conn:
         cur = conn.cursor()
-        myQuery = "UPDATE  BorrowedBy SET DateReturned=:todaysDate WHERE AssetTag=:assetTag AND CardNumber=:cardNumber"
+
         try:
-            cur.execute(myQuery,{"todaysDate":todaysDate, "assetTag":assetTag, "cardNumber":cardNumber})
-
-        except sqlite3.IntegrityError:
-            print("ERROR: There was a problem returning the book. Please check that you have entered the correct card member or asset tag!!!\n")
-            return     
-
-    if conn:
+            cur.execute("""
+                UPDATE  BorrowedBy SET DateReturned = ? WHERE AssetTag = ? AND CardNumber = ?
+                """,(todaysDate,cardNumber,assetTag))
             conn.commit()
-            print("Success! Book returned.\n")    
-    
+
+        except sqlite3.Error:
+            print("ERROR: There was a problem returning the book. Please check that you have entered the correct card member or asset tag!!!\n")
+            return
+
+        if (cur.rowcount >= 1):
+            print(cur.rowcount, "record(s) affected")
+            print("Your Item has been Returned\n")
+            print("Thank you!\n")
+
+        else:
+            print("Failed to return Item, please check AssetTag and CardNumber!\n")
+
+
     return
-
-

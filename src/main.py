@@ -4,6 +4,8 @@ conn = sqlite3.connect('library.db')
 #from src.itemActions import searchByTitle,
 from eventActions import FindanEvent, RegForEvent
 from libraryActions import DonateItem, Volunteer, LibrarianHelp
+from itemActions import searchItem, borrowItem, returnItem
+
 
 print("Hello, Welcome to the library!\nPlease Select one of the following options by typing the associated number.\n")
 
@@ -32,11 +34,17 @@ while (done != '1'):
     elif (choice == '8'):
         LibrarianHelp()
 
+    elif(choice == '1'):
+        searchItem()
+
+    elif(choice == '2'):
+        borrowItem()
+
+    elif(choice == '3'):
+        returnItem()
 
     else:
         print("Please input a valid choice, Please try again \n")
-
-
 
 ##Loop has ended
 print("Thank you for coming! See you soon.")

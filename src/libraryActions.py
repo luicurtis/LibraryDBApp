@@ -3,6 +3,7 @@ import sqlite3
 conn = sqlite3.connect('library.db')
 
 def DonateItem():
+    conn.execute('pragma foreign_keys=ON')
     donating = '0'
 
     while (donating != '1'):
@@ -21,19 +22,22 @@ def DonateItem():
                                 INSERT INTO FutureItems(ItemName, Type)
                                 VALUES (?,?)
                                 """, (UItemName, Utype))
+                            conn.commit()
 
                         except sqlite3.IntegrityError:
                             print("ERROR: There was a problem Donating such item!\n")
-                            break
+                            return
+                        except sqlite3.Error:
+                            print("ERROR: There was a problem Donating such item!\n")
+                            return
 
-                        conn.commit()
                         print('\n')
                         print ( '##############Item Donated Successfully##############' )
                         print('\n')
 
             elif (UserDecision == '2'):
                 donating = 1
-                break
+                return
 
             else:
                 print("Please enter a valid choice, Please try again! \n")
@@ -41,7 +45,7 @@ def DonateItem():
     return None
 
 def Volunteer():
-
+    conn.execute('pragma foreign_keys=ON')
     Volunteering = '0'
     while (Volunteering != '1'):
 
@@ -58,11 +62,15 @@ def Volunteer():
 
                 try:
                     cur.execute(myQuery,{"Blank" : UserCardNumber, "Blank1" : UFirstname, "Blank2" : ULastname})
+                    conn.commit()
 
                 except sqlite3.IntegrityError:
-                    print("ERROR: There was a problem!\n")
+                    print("ERROR: There was a problem, please check the Library CardNumber, First Name, LastName!\n")
 
-                conn.commit()
+                except sqlite3.IntegrityError:
+                    print("ERROR: There was a problem, please check the Library CardNumber, First Name, LastName!\n")
+
+
                 if (cur.rowcount >= 1):
                     print(cur.rowcount, "record(s) affected")
                     print("Volunteer Status is set to True, you will be contacted with further information regarding your hours and task.\n")
@@ -73,7 +81,7 @@ def Volunteer():
 
         elif (UserDecision == '2'):
             Volunteering = 1
-            break
+            return
 
         else:
             print("Please enter a valid choice, Please try again! \n")
@@ -81,7 +89,7 @@ def Volunteer():
     return None
 
 def LibrarianHelp():
-
+    conn.execute('pragma foreign_keys=ON')
     print("1. Library Tech Support Contact\n2. Library Hours\n3. Go back")
     help = '0'
 
@@ -91,7 +99,7 @@ def LibrarianHelp():
 
         if (UserDecision == '3'):
             help = 1
-            break
+            return
 
         elif (UserDecision == '2'):
             print("Mon-Fri 7:00am - 7:00pm || Sat 9:00am - 6:00pm || Sun 9:00am - 3:00pm\n")
