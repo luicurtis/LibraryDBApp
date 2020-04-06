@@ -260,6 +260,4 @@ def returnItem():
 
         else:
             print("Failed to return Item, please check AssetTag and CardNumber!\n")
-
-
     return
